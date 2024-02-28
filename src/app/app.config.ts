@@ -1,7 +1,12 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import {
+  TitleStrategy,
+  provideRouter,
+  withInMemoryScrolling
+} from '@angular/router';
 
 import { routes } from './app.routes';
+import { CustomPageTitleStrategy } from './core/utils/page-title-strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -10,6 +15,10 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         anchorScrolling: 'enabled'
       })
-    )
+    ),
+    {
+      provide: TitleStrategy,
+      useClass: CustomPageTitleStrategy
+    }
   ]
 };
