@@ -1,14 +1,12 @@
 import { RouterOutlet } from '@angular/router';
-import { environment } from '../environments/environment';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet]
 })
-export class AppComponent {
-  title = environment.title + ' - ' + environment.version;
-}
+export class AppComponent {}
