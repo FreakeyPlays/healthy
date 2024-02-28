@@ -1,0 +1,63 @@
+name: Validate
+run-name: 📋 - Validate the Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  validate:
+    name: ✅ Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          node-version-file: '.nvmrc'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Formatter
+        run: npm run format
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run PR Title Lint
+        uses: amannn/action-semantic-pull-request@v5.4.0
+        id: pr_title_lint
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add comment with PR Title Lint error
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ always() && (steps.pr_title_lint.outputs.error_message != null) }}
+        with:
+          header: pr-title-lint-error
+          message: |
+            ⚠️ There appears to be something wrong here. ⚠️
+
+            Please make sure you are following the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/), or update the Title.
+
+            Details:
+
+            ```
+            ${{ steps.pr_title_lint.outputs.error_message }}
+            ```
+
+      - name: Delete old Comment
+        if: ${{ steps.pr_title_lint.outputs.error_message == null }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-title-lint-error
+          delete: true
